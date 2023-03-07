@@ -1,11 +1,15 @@
 use std::time::Duration;
 
-use bili_batch_unsubcribe::auth::QrScanStatus;
-use bili_batch_unsubcribe::auth::{generate_qrcode_key, verify_qrcode_key};
+use bili_batch_unsubcribe::auth::qrcode::QrScanStatus;
+use bili_batch_unsubcribe::auth::qrcode::{generate_qrcode_key, verify_qrcode_key};
+
+use bili_batch_unsubcribe::user::me;
 
 use bili_batch_unsubcribe::{Client, Result};
 
-use tracing::{info};
+use bili_batch_unsubcribe::user::relation::unsubcribe_users_with_tag;
+
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -20,20 +24,27 @@ async fn main() -> Result<()> {
 
     qr2term::print_qr(qrgen.url)?;
 
-    let login_result = login(&mut client, &qrgen.qrcode_key).await;
+    let login_result = qrcode_login(&client, &qrgen.qrcode_key).await;
 
-    match login_result {
-        Some(login_timestamp) => info!("logined successfully at {login_timestamp}"),
+    match &login_result {
+        Some((timestamp, csrf_token)) => info!("logined successfully at {timestamp}, csrf: {csrf_token}"),
         None => {
             info!("qrcode expired. exiting");
             std::process::exit(1);
         }
     }
 
+    let (_timestamp, csrf) = login_result.unwrap();
+
+    let me::UserInfo { mid, uname } = me::my_info(&mut client).await?;
+    info!("id: {mid}, name: {uname}");
+
+    unsubcribe_users_with_tag(&client, 350356, &csrf).await?;
+
     Ok(())
 }
 
-async fn login(client: &mut Client, qr_key: &str) -> Option<u64> {
+async fn qrcode_login(client: &Client, qr_key: &str) -> Option<(u64, String)> {
     loop {
         let re = verify_qrcode_key(client, qr_key).await;
         if let Ok(status) = re {
@@ -42,12 +53,12 @@ async fn login(client: &mut Client, qr_key: &str) -> Option<u64> {
                     eprintln!("qrcode expired");
                     return None;
                 }
-                QrScanStatus::Success(time) => return Some(time),
+                QrScanStatus::Success(time, csrf) => return Some((time, csrf)),
                 QrScanStatus::Unconfirmed => info!("scanned but not confirmed"),
                 QrScanStatus::Unscanned => continue,
             }
         }
 
-        tokio::time::sleep(Duration::from_millis(5000)).await;
+        tokio::time::sleep(Duration::from_millis(3000)).await;
     }
 }
