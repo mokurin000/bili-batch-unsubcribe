@@ -20,17 +20,7 @@ pub struct FollowingDetail {
 }
 
 pub async fn unsubcribe_users_with_tag(client: &Client, tag: i32, csrf: &str) -> Result<()> {
-    let count = client
-        .get(format!(
-            "https://api.bilibili.com/x/relation/tag?tagid={tag}"
-        ))
-        .send()
-        .await?
-        .json::<Response>()
-        .await?
-        .data
-        .len();
-    for pn in 1..=((count as f64) / 50.0).ceil() as i32 {
+    for pn in 1.. {
         let resp = client
             .get("https://api.bilibili.com/x/relation/tag")
             .query(&[("tagid", tag), ("pn", pn)])
@@ -38,6 +28,11 @@ pub async fn unsubcribe_users_with_tag(client: &Client, tag: i32, csrf: &str) ->
             .await
             .unwrap();
         let mids = resp.json::<Response>().await.unwrap().data;
+
+        if mids.len() == 0 {
+            break;
+        }
+
         for FollowingDetail { mid } in mids {
             let resp = client
                 .post("https://api.bilibili.com/x/relation/modify")
