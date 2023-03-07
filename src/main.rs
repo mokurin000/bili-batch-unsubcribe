@@ -11,10 +11,11 @@ use bili_batch_unsubcribe::user::relation::unsubcribe_users_with_tag;
 
 use tracing::info;
 
-#[tokio::main]
-async fn main() -> Result<()> {
-    tracing_subscriber::fmt::init();
+use time::UtcOffset;
+use tracing_subscriber::fmt::{self, time::OffsetTime};
 
+#[tokio::main]
+async fn run() -> Result<()> {
     let mut client = Client::builder()
         .cookie_store(true)
         .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36")
@@ -27,7 +28,9 @@ async fn main() -> Result<()> {
     let login_result = qrcode_login(&client, &qrgen.qrcode_key).await;
 
     match &login_result {
-        Some((timestamp, csrf_token)) => info!("logined successfully at {timestamp}, csrf: {csrf_token}"),
+        Some((timestamp, csrf_token)) => {
+            info!("logined successfully at {timestamp}, csrf: {csrf_token}")
+        }
         None => {
             info!("qrcode expired. exiting");
             std::process::exit(1);
@@ -42,6 +45,15 @@ async fn main() -> Result<()> {
     unsubcribe_users_with_tag(&client, 350356, &csrf).await?;
 
     Ok(())
+}
+
+fn main() -> Result<()> {
+    let offset = UtcOffset::current_local_offset().expect("should get local offset!");
+    let timer = OffsetTime::new(offset, time::format_description::well_known::Rfc3339);
+    let collector = tracing_subscriber::fmt().with_timer(timer);
+    collector.init();
+
+    run()
 }
 
 async fn qrcode_login(client: &Client, qr_key: &str) -> Option<(u64, String)> {

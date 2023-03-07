@@ -48,7 +48,7 @@ pub async fn unsubcribe_users_with_tag(client: &Client, tag: i32, csrf: &str) ->
             let text = resp.text().await?;
 
             info!("{text}");
-            tokio::time::sleep(Duration::from_millis(200)).await;
+            tokio::time::sleep(Duration::from_millis(100)).await;
         }
     }
 
