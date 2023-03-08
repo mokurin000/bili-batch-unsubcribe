@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use bili_batch_unsubcribe::auth::qrcode::QrScanStatus;
 use bili_batch_unsubcribe::auth::qrcode::{generate_qrcode_key, verify_qrcode_key};
 
@@ -9,17 +7,25 @@ use bili_batch_unsubcribe::{Client, Result};
 
 use bili_batch_unsubcribe::user::relation::unsubcribe_users_with_tag;
 
+use reqwest_middleware::ClientBuilder;
+use reqwest_retry::policies::ExponentialBackoff;
+use reqwest_retry::RetryTransientMiddleware;
 use tracing::info;
 
 use time::UtcOffset;
-use tracing_subscriber::fmt::{self, time::OffsetTime};
+use tracing_subscriber::fmt::time::OffsetTime;
 
 #[tokio::main]
 async fn run() -> Result<()> {
-    let mut client = Client::builder()
+    let retry_policy = ExponentialBackoff::builder().build_with_max_retries(5);
+    let mut client = ClientBuilder::new(reqwest::Client::builder()
         .cookie_store(true)
         .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36")
-        .build()?;
+        .build()?)
+        // Trace HTTP requests. See the tracing crate to make use of these traces.
+        // Retry failed requests.
+        .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+        .build();
 
     let qrgen = generate_qrcode_key(&mut client).await?;
 
@@ -57,6 +63,7 @@ fn main() -> Result<()> {
 }
 
 async fn qrcode_login(client: &Client, qr_key: &str) -> Option<(u64, String)> {
+    use std::time::Duration;
     loop {
         let re = verify_qrcode_key(client, qr_key).await;
         if let Ok(status) = re {
