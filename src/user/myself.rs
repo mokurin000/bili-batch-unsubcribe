@@ -18,7 +18,7 @@ pub struct UserInfo {
     pub uname: String,
 }
 
-pub async fn my_info(client: &mut Client) -> Result<UserInfo> {
+pub async fn my_info(client: &Client) -> Result<UserInfo> {
     Ok(client
         .get("https://api.bilibili.com/x/web-interface/nav")
         .send()

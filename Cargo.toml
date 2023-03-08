@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 qr2term = "0.3.1"
 inquire = "0.6.0"
+rustc-hash = "1.1.0"
 
 anyhow = "1.0.69"
 tracing = "0.1.37"

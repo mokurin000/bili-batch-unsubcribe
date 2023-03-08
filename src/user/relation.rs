@@ -7,7 +7,7 @@ use crate::Client;
 use crate::Result;
 
 #[derive(Deserialize)]
-struct Response {
+struct TagDetailResponse {
     code: i32,
     message: String,
     ttl: i32,
@@ -19,7 +19,32 @@ pub struct FollowingDetail {
     pub mid: u64,
 }
 
-pub async fn unsubcribe_users_with_tag(client: &Client, tag: i32, csrf: &str) -> Result<()> {
+#[derive(Deserialize)]
+struct TagsResponse {
+    code: i32,
+    message: String,
+    ttl: i32,
+    data: Vec<Tag>,
+}
+
+#[derive(Deserialize)]
+pub struct Tag {
+    pub tagid: i64,
+    pub name: String,
+    pub count: u64,
+}
+
+pub async fn list_tags(client: &Client) -> Result<Vec<Tag>> {
+    let tags_rep = client
+        .get("https://api.bilibili.com/x/relation/tags")
+        .send()
+        .await?
+        .json::<TagsResponse>()
+        .await?;
+    Ok(tags_rep.data)
+}
+
+pub async fn unsubcribe_users_with_tag(client: &Client, tag: i64, csrf: &str) -> Result<()> {
     for pn in 1.. {
         let resp = client
             .get("https://api.bilibili.com/x/relation/tag")
@@ -27,7 +52,7 @@ pub async fn unsubcribe_users_with_tag(client: &Client, tag: i32, csrf: &str) ->
             .send()
             .await
             .unwrap();
-        let mids = resp.json::<Response>().await.unwrap().data;
+        let mids = resp.json::<TagDetailResponse>().await.unwrap().data;
 
         if mids.len() == 0 {
             break;

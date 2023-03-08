@@ -1,2 +1,2 @@
-pub mod me;
+pub mod myself;
 pub mod relation;
