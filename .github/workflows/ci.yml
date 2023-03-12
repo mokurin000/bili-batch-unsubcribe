@@ -86,5 +86,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ matrix.target }}.tar
-          tag_name: v0.1.0-${{ steps.vars.outputs.sha_short }}
+          tag_name: 0.1.0-${{ steps.vars.outputs.sha_short }}
           prerelease: true
