@@ -1,5 +1,5 @@
 [package]
-name = "bili-batch-unsubcribe"
+name = "bili-batch-unsubscribe"
 version = "0.1.0"
 edition = "2021"
 

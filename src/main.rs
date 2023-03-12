@@ -1,10 +1,10 @@
-use bili_batch_unsubcribe::auth::qrcode::generate_qrcode_key;
+use bili_batch_unsubscribe::auth::qrcode::generate_qrcode_key;
 use rustc_hash::FxHashMap;
 
-use bili_batch_unsubcribe::user::myself;
-use bili_batch_unsubcribe::user::relation::{list_tags, unsubcribe_users_with_tag, Tag};
+use bili_batch_unsubscribe::user::myself;
+use bili_batch_unsubscribe::user::relation::{list_tags, unsubcribe_users_with_tag, Tag};
 
-use bili_batch_unsubcribe::{Client, Result};
+use bili_batch_unsubscribe::{Client, Result};
 
 use tracing::{error, info};
 
@@ -81,8 +81,8 @@ fn build_reqwest_client() -> Result<Client> {
 }
 
 async fn check_until_login_qr(client: &Client, qr_key: &str) -> Option<(u64, String)> {
-    use bili_batch_unsubcribe::auth::qrcode::verify_qrcode_key;
-    use bili_batch_unsubcribe::auth::qrcode::QrScanStatus;
+    use bili_batch_unsubscribe::auth::qrcode::verify_qrcode_key;
+    use bili_batch_unsubscribe::auth::qrcode::QrScanStatus;
     use std::time::Duration;
     loop {
         let re = verify_qrcode_key(client, qr_key).await;
