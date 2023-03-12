@@ -6,7 +6,7 @@ use bili_batch_unsubcribe::user::relation::{list_tags, unsubcribe_users_with_tag
 
 use bili_batch_unsubcribe::{Client, Result};
 
-use tracing::info;
+use tracing::{error, info};
 
 #[tokio::main]
 async fn run() -> Result<()> {
@@ -60,7 +60,7 @@ async fn login_with_qr(client: &Client) -> Result<Option<(u64, String)>> {
             Ok(Some((timestamp, csrf_token)))
         }
         None => {
-            info!("qrcode expired. exiting");
+            error!("qrcode expired. exiting");
             std::process::exit(1);
         }
     }
@@ -89,12 +89,11 @@ async fn check_until_login_qr(client: &Client, qr_key: &str) -> Option<(u64, Str
         if let Ok(status) = re {
             match status {
                 QrScanStatus::Expired => {
-                    eprintln!("qrcode expired");
                     return None;
                 }
-                QrScanStatus::Success(time, csrf) => return Some((time, csrf)),
                 QrScanStatus::Unconfirmed => info!("scanned but not confirmed"),
                 QrScanStatus::Unscanned => continue,
+                QrScanStatus::Success { timestamp, csrf } => return Some((timestamp, csrf)),
             }
         }
 

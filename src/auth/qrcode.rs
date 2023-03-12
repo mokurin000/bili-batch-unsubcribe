@@ -20,8 +20,7 @@ pub struct QrGenResponse {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum QrScanStatus {
-    /// timestamp, csrf
-    Success(u64, String),
+    Success { timestamp: u64, csrf: String },
     Expired,
     Unconfirmed,
     Unscanned,
@@ -53,14 +52,14 @@ pub async fn verify_qrcode_key(client: &Client, qrcode_key: &str) -> Result<QrSc
         .expect("no code in qrcode_key poll response");
 
     match code.as_u64().expect("error parsing code as a integer") {
-        0 => Ok(QrScanStatus::Success(
-            scan_result
+        0 => Ok(QrScanStatus::Success {
+            timestamp: scan_result
                 .pointer("/data/timestamp")
                 .expect("no timestamp in response with code 0")
                 .as_u64()
                 .unwrap(),
-            csrf.unwrap(),
-        )),
+            csrf: csrf.unwrap(),
+        }),
         86038 => Ok(QrScanStatus::Expired),
         86090 => Ok(QrScanStatus::Unconfirmed),
         86101 => Ok(QrScanStatus::Unscanned),
