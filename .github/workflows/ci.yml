@@ -55,6 +55,13 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v1
+      
+      - name: Prepare toolchain
+        shell: bash
+        run: |
+          if  [[ ${{ matrix.target }} = *musl ]]
+          then apt-get install musl-tools
+          fi
 
       - name: Run code build
         uses: actions-rs/cargo@v1
