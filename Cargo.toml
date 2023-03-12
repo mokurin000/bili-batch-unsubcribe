@@ -28,7 +28,7 @@ features = ["rt-multi-thread", "macros"]
 
 [dependencies.reqwest]
 version = "0.11.14"
-features = ["cookies", "json", "rustls-tls-native-roots"]
+features = ["cookies", "json", "native-tls-vendored"]
 default-features = false
 
 [dependencies.serde]
@@ -38,3 +38,9 @@ features = ["derive"]
 [dependencies.time]
 version = "0.3.20"
 features = ["local-offset"]
+
+[profile.release]
+strip = true
+panic = "abort"
+codegen-units = 1
+lto = true
