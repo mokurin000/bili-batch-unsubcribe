@@ -60,7 +60,7 @@ jobs:
         shell: bash
         run: |
           if  [[ ${{ matrix.target }} = *musl ]]
-          then apt-get install musl-tools
+          then sudo apt-get install musl-tools
           fi
 
       - name: Run code build
