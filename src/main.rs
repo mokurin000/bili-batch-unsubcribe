@@ -1,5 +1,5 @@
 use bili_batch_unsubscribe::auth::qrcode::generate_qrcode_key;
-use rustc_hash::FxHashMap;
+use hashbrown::HashMap;
 
 use bili_batch_unsubscribe::user::myself;
 use bili_batch_unsubscribe::user::relation::{list_tags, unsubcribe_users_with_tag, Tag};
@@ -19,7 +19,8 @@ async fn run() -> Result<()> {
     info!("id: {mid}, name: {uname}");
 
     let tags = list_tags(&client).await?;
-    let tags_map = FxHashMap::from_iter(tags.iter().map(|Tag { name, tagid, .. }| (name, tagid)));
+    let tags_map: HashMap<&String, i64> =
+        HashMap::from_iter(tags.iter().map(|Tag { name, tagid, .. }| (name, *tagid)));
 
     let tags_selected = inquire::MultiSelect::new(
         "请选择要批量取关的分组：",
@@ -29,7 +30,7 @@ async fn run() -> Result<()> {
     .prompt()?;
 
     for tag_name in tags_selected {
-        unsubcribe_users_with_tag(&client, *tags_map[tag_name], &csrf).await?;
+        unsubcribe_users_with_tag(&client, tags_map[tag_name], &csrf).await?;
     }
 
     Ok(())
