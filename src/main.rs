@@ -48,11 +48,11 @@ fn main() -> Result<()> {
 }
 
 async fn login_with_qr(client: &Client) -> Result<Option<(u64, String)>> {
-    let qrgen = generate_qrcode_key(&client).await?;
+    let qrgen = generate_qrcode_key(client).await?;
 
     qr2term::print_qr(qrgen.url)?;
 
-    let login_result = check_until_login_qr(&client, &qrgen.qrcode_key).await;
+    let login_result = check_until_login_qr(client, &qrgen.qrcode_key).await;
 
     match login_result {
         Some((timestamp, csrf_token)) => {

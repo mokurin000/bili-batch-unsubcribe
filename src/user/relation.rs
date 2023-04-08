@@ -54,7 +54,7 @@ pub async fn unsubcribe_users_with_tag(client: &Client, tag: i64, csrf: &str) ->
             .unwrap();
         let mids = resp.json::<TagDetailResponse>().await.unwrap().data;
 
-        if mids.len() == 0 {
+        if mids.is_empty() {
             break;
         }
 
