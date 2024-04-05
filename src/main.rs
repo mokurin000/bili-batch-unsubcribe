@@ -1,5 +1,5 @@
+use ahash::AHashMap as HashMap;
 use bili_batch_unsubscribe::auth::qrcode::generate_qrcode_key;
-use hashbrown::HashMap;
 
 use bili_batch_unsubscribe::user::myself;
 use bili_batch_unsubscribe::user::relation::{list_tags, unsubcribe_users_with_tag, Tag};

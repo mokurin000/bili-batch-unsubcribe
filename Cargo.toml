@@ -7,16 +7,16 @@ edition = "2021"
 
 [dependencies]
 qr2term = "0.3.1"
-inquire = "0.6.0"
-hashbrown = "0.13.2"
+inquire = "0.7.4"
+ahash = "0.8"
 
 anyhow = "1.0.69"
 tracing = "0.1.37"
 
 serde_json = "1.0.94"
 
-reqwest-middleware = "0.2.0"
-reqwest-retry = "0.2.1"
+reqwest-middleware = "0.2.5"
+reqwest-retry = "0.4.0"
 
 [dependencies.tracing-subscriber]
 version = "0.3"
@@ -27,7 +27,7 @@ version = "1"
 features = ["rt-multi-thread", "macros"]
 
 [dependencies.reqwest]
-version = "0.11.14"
+version = "0.11.27"
 features = ["cookies", "json", "native-tls-vendored"]
 default-features = false
 
