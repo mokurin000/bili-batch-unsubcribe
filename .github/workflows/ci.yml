@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [macos-x86_64, linux_glibc-x86_64, linux_musl-x86_64, linux_musl-i686,  windows-i686, windows-x86_64]
+        platform: [macos-x86_64, linux_glibc-x86_64, windows-i686, windows-x86_64]
         include:
         
           - platform: macos-x86_64
@@ -22,16 +22,6 @@ jobs:
 
           - platform: linux_glibc-x86_64
             target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-            bin: bili-batch-unsubscribe
-            
-          - platform: linux_musl-x86_64
-            target: x86_64-unknown-linux-musl
-            os: ubuntu-latest
-            bin: bili-batch-unsubscribe
-        
-          - platform: linux_musl-i686
-            target: i686-unknown-linux-musl
             os: ubuntu-latest
             bin: bili-batch-unsubscribe
             
@@ -46,15 +36,14 @@ jobs:
             bin: bili-batch-unsubscribe.exe
             
     steps:
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           target: ${{ matrix.target }}
           toolchain: nightly
           override: true
 
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
       
       - name: Prepare toolchain
         shell: bash
@@ -64,27 +53,24 @@ jobs:
           fi
 
       - name: Run code build
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: nightly
-          command: build
-          args: --release --target ${{ matrix.target }}
+        shell: bash
+        run: 
+          cargo build --release --target ${{ matrix.target }}
 
       - name: Prepare assets
         shell: bash
         run: |
           mv target/${{ matrix.target }}/release/${{ matrix.bin }} .
-          
-          tar -cvf ${{ matrix.target }}.tar LICENSE ${{ matrix.bin }}
+          tar -cvfz ${{ matrix.target }}.tar.gz LICENSE ${{ matrix.bin }}
           
       - name: Declare some variables # https://stackoverflow.com/a/61699863
         id: vars
         shell: bash
         run: |
-          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Pre-Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.target }}.tar
+          files: ${{ matrix.target }}.tar.gz
           tag_name: 0.1.0-${{ steps.vars.outputs.sha_short }}
           prerelease: true
