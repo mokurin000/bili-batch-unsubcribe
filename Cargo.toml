@@ -44,3 +44,6 @@ strip = true
 panic = "abort"
 codegen-units = 1
 lto = true
+
+[patch.crates-io]
+qr2term = { git = "https://github.com/mokurin000/qr2term-rs.git" }

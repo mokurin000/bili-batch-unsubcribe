@@ -205,8 +205,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "829d955a0bb380ef178a640b91779e3987da38c9aea133b20614cfed8cdea9c6"
 dependencies = [
  "bitflags 2.6.0",
+ "crossterm_winapi",
  "parking_lot 0.12.3",
  "rustix",
+ "winapi",
 ]
 
 [[package]]
@@ -895,8 +897,7 @@ dependencies = [
 [[package]]
 name = "qr2term"
 version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8d9f41c1554e6c4c785d74ccb2db9fde79a79cb2218baf3a70a2751c4615e00"
+source = "git+https://github.com/mokurin000/qr2term-rs.git#4c2a8f371caccbe79a646a9beafb80ccc28c3000"
 dependencies = [
  "crossterm 0.28.1",
  "qrcode",

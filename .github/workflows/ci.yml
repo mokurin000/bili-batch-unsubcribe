@@ -12,7 +12,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [macos-arm64, linux_glibc-x86_64, windows-x86_64]
         include:
           - platform: macos-arm64
             target: aarch64-apple-darwin
