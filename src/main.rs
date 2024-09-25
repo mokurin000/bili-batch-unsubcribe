@@ -1,12 +1,9 @@
-use ahash::AHashMap as HashMap;
-use bili_batch_unsubscribe::auth::qrcode::generate_qrcode_key;
-
-use bili_batch_unsubscribe::user::myself;
-use bili_batch_unsubscribe::user::relation::{list_tags, unsubcribe_users_with_tag, Tag};
-
-use bili_batch_unsubscribe::{Client, Result};
-
 use tracing::{error, info};
+
+use bili_batch_unsubscribe::auth::qrcode::generate_qrcode_key;
+use bili_batch_unsubscribe::user::myself;
+use bili_batch_unsubscribe::user::relation::{list_tags, unsubcribe_users_with_tag};
+use bili_batch_unsubscribe::{Client, Result};
 
 #[tokio::main]
 async fn run() -> Result<()> {
@@ -19,18 +16,19 @@ async fn run() -> Result<()> {
     info!("id: {mid}, name: {uname}");
 
     let tags = list_tags(&client).await?;
-    let tags_map: HashMap<&String, i64> =
-        HashMap::from_iter(tags.iter().map(|Tag { name, tagid, .. }| (name, *tagid)));
+    let tags_selected = cliclack::MultiSelect::new("请选择要批量取关的分组：")
+        .filter_mode()
+        .items(
+            tags.iter()
+                .map(|t| (&t.tagid, &t.name, t.count))
+                .collect::<Vec<_>>()
+                .as_ref(),
+        )
+        .required(false)
+        .interact()?;
 
-    let tags_selected = inquire::MultiSelect::new(
-        "请选择要批量取关的分组：",
-        tags.iter().map(|t| &t.name).collect(),
-    )
-    .with_help_message("↑↓移动，空格选择，→ 全选，← 全不选, 输入即可搜索")
-    .prompt()?;
-
-    for tag_name in tags_selected {
-        unsubcribe_users_with_tag(&client, tags_map[tag_name], &csrf).await?;
+    for &tag_id in tags_selected {
+        unsubcribe_users_with_tag(&client, tag_id, &csrf).await?;
     }
 
     Ok(())

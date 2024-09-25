@@ -7,8 +7,7 @@ edition = "2021"
 
 [dependencies]
 qr2term = "0.3.2"
-inquire = "0.7.5"
-ahash = "0.8"
+cliclack = "0.3.5"
 
 anyhow = "1.0.89"
 tracing = "0.1.37"

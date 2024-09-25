@@ -50,11 +50,11 @@ pub async fn unsubcribe_users_with_tag(client: &Client, tag: i64, csrf: &str) ->
             .get("https://api.bilibili.com/x/relation/tag")
             .query(&[("tagid", tag), ("pn", pn)])
             .send()
-            .await
-            .unwrap();
-        let mids = resp.json::<TagDetailResponse>().await.unwrap().data;
+            .await?;
+        let mids = resp.json::<TagDetailResponse>().await?.data;
 
         if mids.is_empty() {
+            info!("un-subscribe finished for tag {tag}");
             break;
         }
 
