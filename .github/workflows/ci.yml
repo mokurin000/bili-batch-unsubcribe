@@ -14,9 +14,13 @@ jobs:
       matrix:
         platform: [macos-arm64, linux_glibc-x86_64, windows-x86_64]
         include:
-        
           - platform: macos-arm64
             target: aarch64-apple-darwin
+            os: macos-latest
+            bin: bili-batch-unsubscribe
+
+          - platform: macos-x86_64
+            target: x86_64-apple-darwin
             os: macos-latest
             bin: bili-batch-unsubscribe
 
@@ -49,7 +53,7 @@ jobs:
         shell: bash
         run: |
           mv target/${{ matrix.target }}/release/${{ matrix.bin }} .
-          tar -cvfz ${{ matrix.target }}.tar.gz LICENSE ${{ matrix.bin }}
+          tar -cvzf ${{ matrix.target }}.tar.gz LICENSE ${{ matrix.bin }}
           
       - name: Pre-Release
         uses: softprops/action-gh-release@v2
