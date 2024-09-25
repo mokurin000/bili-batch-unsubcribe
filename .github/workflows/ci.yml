@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [macos-x86_64, linux_glibc-x86_64, windows-i686, windows-x86_64]
+        platform: [macos-x86_64, linux_glibc-x86_64, windows-x86_64]
         include:
         
           - platform: macos-x86_64
@@ -24,11 +24,6 @@ jobs:
             target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             bin: bili-batch-unsubscribe
-            
-          - platform: windows-i686
-            target: i686-pc-windows-msvc
-            os: windows-latest
-            bin: bili-batch-unsubscribe.exe
             
           - platform: windows-x86_64
             target: x86_64-pc-windows-msvc
