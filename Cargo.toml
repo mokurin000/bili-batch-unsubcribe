@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qr2term = "0.3.2"
+qr2term = "0.3.3"
 cliclack = "0.3.5"
 
 anyhow = "1.0.89"
@@ -43,6 +43,3 @@ strip = true
 panic = "abort"
 codegen-units = 1
 lto = true
-
-[patch.crates-io]
-qr2term = { git = "https://github.com/mokurin000/qr2term-rs.git" }

@@ -862,8 +862,9 @@ dependencies = [
 
 [[package]]
 name = "qr2term"
-version = "0.3.2"
-source = "git+https://github.com/mokurin000/qr2term-rs.git#4c2a8f371caccbe79a646a9beafb80ccc28c3000"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6867c60b38e9747a079a19614dbb5981a53f21b9a56c265f3bfdf6011a50a957"
 dependencies = [
  "crossterm",
  "qrcode",
