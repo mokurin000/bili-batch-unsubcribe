@@ -12,11 +12,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [macos-x86_64, linux_glibc-x86_64, windows-x86_64]
+        platform: [macos-arm64, linux_glibc-x86_64, windows-x86_64]
         include:
         
-          - platform: macos-x86_64
-            target: x86_64-apple-darwin
+          - platform: macos-arm64
+            target: aarch64-apple-darwin
             os: macos-latest
             bin: bili-batch-unsubscribe
 
@@ -40,13 +40,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Prepare toolchain
-        shell: bash
-        run: |
-          if  [[ ${{ matrix.target }} = *musl ]]
-          then sudo apt-get install musl-tools
-          fi
-
       - name: Run code build
         shell: bash
         run: 
@@ -58,14 +51,11 @@ jobs:
           mv target/${{ matrix.target }}/release/${{ matrix.bin }} .
           tar -cvfz ${{ matrix.target }}.tar.gz LICENSE ${{ matrix.bin }}
           
-      - name: Declare some variables # https://stackoverflow.com/a/61699863
-        id: vars
-        shell: bash
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Pre-Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.target }}.tar.gz
-          tag_name: 0.1.0-${{ steps.vars.outputs.sha_short }}
-          prerelease: true
+          tag_name: nightly
+          prerelease: false
+          make_latest: true
+
